@@ -7,9 +7,9 @@ the machine to daydream for a short time.
 
 '''
 
-import random
 import math
 from operator import add
+import random
 
 class RBM:
     '''A restricted Boltzmann machine.
@@ -47,6 +47,13 @@ class RBM:
 
         weights_are_valid = len(weights) == num_visible and all([len(w) == num_hidden for w in weights])
         self.weights = weights if weights_are_valid else self._format_weights(weights, num_visible, num_hidden)
+
+    def load_weights(self, path):
+        with open(path, 'r') as f:
+            weights = [[float(d) for d in line.strip().split(',')] for line in f]
+
+        weights_are_valid = len(weights) == self.num_visible and all([len(w) == self.num_hidden for w in weights])
+        self.weights = weights if weights_are_valid else self._format_weights(weights, self.num_visible, self.num_hidden)
 
     def train(self, data, epochs = 100, sample_rate = 1):
         '''Trains the machine on the given dataset.
