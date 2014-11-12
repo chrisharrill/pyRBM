@@ -49,6 +49,12 @@ class RBM:
         self.weights = weights if weights_are_valid else self._format_weights(weights, num_visible, num_hidden)
 
     def load_weights(self, path):
+        '''Reads weight values from a file.
+
+        Args:
+          path (str): A path to a csv file containing weight values.
+        
+        '''
         with open(path, 'r') as f:
             weights = [[float(d) for d in line.strip().split(',')] for line in f]
 
@@ -70,6 +76,7 @@ class RBM:
         '''
         num_samples = len(data) if sample_rate >= 1 or sample_rate <= 0 else int(len(data) * sample_rate)
         for epoch in range(epochs):
+            print 'Epoch ' + str(epoch)
             if sample_rate < 1 and sample_rate > 0:
                 samples = random.sample(data, num_samples)
             else:
@@ -85,6 +92,7 @@ class RBM:
                 for j in range(self.num_hidden):
                     self.weights[i][j] += deltas[i][j]
             error = sum([sum([(samples[s][i] - visible_probabilities[s][i]) ** 2 for i in range(self.num_visible)]) for s in range(num_samples)])
+            print 'Error: ' + str(error)
 
     def run_visible_units(self, data):
         '''Activates the machine for a given set of inputs to the visible units.
@@ -146,7 +154,7 @@ class RBM:
 
         return self.run_hidden_units(self.run_visible_units(data)[0])
 
-    def daydream(self, limit = 10):
+    def daydream(self, limit = 10, initial_values = []):
         '''Repeatedly activates the machine, starting in a random state.
 
         Args:
@@ -157,7 +165,10 @@ class RBM:
 
         '''
 
-        current_activations = [[random.random() for _ in range(self.num_visible)]]
+        if len(initial_values) > 0:
+            current_activations = initial_values
+        else:
+            current_activations = [[random.random() for _ in range(self.num_visible)]]
         current_probabiltiies = []
         results = []
         for _ in range(limit):
